@@ -521,8 +521,8 @@ var send = function(type, payload){
 var onStream = function(obj, source){
   window.ms = obj.stream;
   console.log('got', source, 'stream', 'id', ms.id, ms);
-  if(ms.id == 'default')
-    return;
+  // if(ms.id == 'default')
+    // return;
   elm = peerApi.attachMediaStreamtoDOM(ms);
   // elm.setAttribute("controls", "true");
   elm.className = source;
