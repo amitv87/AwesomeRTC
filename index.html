@@ -1,1 +1,731 @@
-Hello World :)
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <link rel="stylesheet" type="text/css" href="css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="css/material.min.css"/>
+</head>
+<body>
+  <div id="videoContainer" class="hide"></div>
+  <div id="video_controls" class="hide">
+    <div id="sessionName">Hello</div>
+    <table>
+      <tr>
+        <td>
+          <button id="cam" class="greyB mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <div class="bg24 cam"></div>
+          </button>
+        </td>
+        <td>
+          <button id="screen" class="greyB mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <div class="bg24 screen"></div>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div id="controls" class="hide">
+    <button id="full_screen" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+      <div class="bg36 gofs"></div>
+    </button>
+    <div class="mdl-tooltip mdl-tooltip--top" for="full_screen" id="full_screen_caption">Go Full-Screen</div>
+    <table>
+      <tr>
+        <td>
+          <button id="maudio" class="blueB mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <div class="bg24 mute_audio"></div>
+          </button>
+        </td>
+        <td>
+          <button id="end_call" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <div class="bg36 end_call"></div>
+          </button>
+        </td>
+        <td>
+          <button id="mvideo" class="blueB mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <div class="bg24 mute_video"></div>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div id="loader" class="hide">
+    <div class="outer">
+      <div class="middle">
+        <div class="inner">
+          <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="main">
+    <div class="outer">
+      <div class="middle">
+        <div class="inner">
+          <div id="action_controls">
+            <button id="host" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-right:10px;">Host</button>
+            <button id="join" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-left:10px;">Join</button>
+            <br><br>
+            <div style="position: absolute;width: 100%;height: 40%;overflow-y:scroll;overflow-x:hidden;">
+              <table style="margin:0 auto;min-width:50%;display:none" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                <tbody id="sessionCont"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="host_dialog" class="hide">
+            <div class="mdl-textfield mdl-js-textfield">
+              <input class="mdl-textfield__input" type="text" id="nameh">
+              <label class="mdl-textfield__label" for="nameh">Give a name to the session</label>
+            </div><br><br>
+            <div style="float:right">
+              <button id="host_cancel" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-right:10px;">Cancel</button>
+              <button id="host_ok" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-left:10px;">OK</button>
+            </div>
+          </div>
+          <div id="join_dialog" class="hide">
+            <div class="mdl-textfield mdl-js-textfield">
+              <input class="mdl-textfield__input" type="text" id="namej">
+              <label class="mdl-textfield__label" for="namej">Give a name to the session</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield">
+              <input class="mdl-textfield__input" type="text" id="url">
+              <label class="mdl-textfield__label" for="url">Paste the url here</label>
+              <span class="mdl-textfield__error">Input is not a number!</span>
+            </div><br><br>
+            <div style="float:right">
+              <button id="join_cancel" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-right:10px;">Cancel</button>
+              <button id="join_ok" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-left:10px;">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="share" class="hide">
+    <div style="padding:20px;background-color:#FAFAFA;border-radius:5px;">
+      <div class="mdl-textfield mdl-js-textfield" style="padding:0px;">
+        <textarea readonly class="mdl-textfield__input" style="word-break:break-all;resize: none;" type="text" rows= "3" id="share_input"></textarea>
+      </div>
+      <button data-clipboard-target="#share_input" id="copy" style="margin-left:20px;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin-right:10px;"></button>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/material.min.js"></script>
+<script type="text/javascript" src="js/plugins.js"></script>
+<script type="text/javascript" src="js/peerApi.js"></script>
+<script type="text/javascript">
+
+var cp = new Clipboard('#copy');
+cp.on('success', function(e) {
+  $('#copy').text('Copied');
+});
+cp.on('error', function(e) {
+  $('#copy').text('Failed');
+});
+var textInput = $('#share').children();
+
+var sessionKey = getParameterByName('skey');
+var _skey = '';
+
+var db = store.getAll();
+if(!db.sessions){
+  store.set('sessions', {});
+  db = store.getAll();
+}
+
+function init(){
+  if(sessionKey.length == 40 || sessionKey.length == 80){
+    if(!db.sessions[sessionKey]){
+      console.log('new session');
+      if(sessionKey.length == 40){
+        $('#join').click();
+        $('#namej').val('').parent().removeClass('is-dirty');
+        $('#url').val(window.location.href).parent().addClass('is-dirty');
+      }
+      else if(sessionKey.length == 80){
+        $('#host').click();
+        $('#nameh').val('').parent().removeClass('is-dirty');
+        _skey = sessionKey;
+      }
+    }
+    else{
+      console.log('existing session');
+      $('#sessionName').html(db.sessions[sessionKey].name);
+      startByParams();
+    }
+  }
+  else if(sessionKey.length > 0){
+    window.location.href = window.location.href.split('?')[0];
+  }
+  else{
+    console.log('fresh');
+  }
+}
+
+function fetchSessions(){
+  db = store.getAll();
+  var tbody = $('#sessionCont');
+  tbody.empty();
+  var sessionsArr = [];
+  var sort = function(a, b) {
+    return b.ts - a.ts;
+  };
+  for(var skey in db.sessions){
+    var sinfo = db.sessions[skey];
+    sinfo.skey = skey;
+    sessionsArr.push(sinfo);
+  }
+  sessionsArr.sort(sort);
+  if(sessionsArr.length == 0)
+    tbody.parent().hide();
+  else
+    tbody.parent().show();
+  for(var i = 0; i < sessionsArr.length; i++){
+    var sinfo = sessionsArr[i];
+    var trstr = '';
+    trstr += '<tr id="' + sinfo.skey + '"><td class="mdl-data-table__cell--non-numeric"><div class="session_name">' + sinfo.name + '</div>';
+    trstr += '<div class="session_ts">' + (new Date(sinfo.ts)) + '</div></td>';
+    trstr += '<td style="width:110px;">';
+    if(sinfo.isHost)
+      trstr += '<div id="tt' + i.toString() +'" class="icon_share"></div><div class="mdl-tooltip" for="tt' + i.toString() +'">Share</div>';
+    trstr += '<div id="ttc' + i.toString() +'" class="icon_clear"></div></div><div class="mdl-tooltip" for="ttc' + i.toString() +'">Remove</div>';
+    trstr += '</td></tr>';
+    tbody.append(trstr);
+  }
+  $('.icon_share').click(function(e){
+    var url = 'https://amitv87.github.io/AwesomeRTC/?skey=' + $(this).parent().parent().attr('id').substring(0,40);
+    textInput.find('#share_input').val(url);
+    $('#copy').text('Copy');
+    textInput.popup({
+      autoopen: true,
+    });
+    return false;
+  });
+  $('.icon_clear').click(function(e){
+    var skey = $(this).parent().parent().attr('id');
+    $(this).parent().parent().remove();
+    var db = store.getAll();
+    delete db.sessions[skey];
+    store.set('sessions', db.sessions);
+    if(Object.keys(db.sessions).length == 0)
+      tbody.parent().hide();
+    return false;
+  });
+  componentHandler.upgradeDom();
+}
+
+function newSession(skey){
+  var name = $('#nameh').val();
+  if(name.length == 0)
+    name = 'default';
+  storeSession(skey, name, true);
+  fetchSessions();
+}
+
+$('#host').click(function(){
+  $('#action_controls').addClass('hide');
+  $('#host_dialog').removeClass('hide');
+});
+$('#host_cancel').click(function(){
+  $('#action_controls').removeClass('hide');
+  $('#host_dialog').addClass('hide');
+  $('#nameh').val('').parent().removeClass('is-dirty');
+  _skey = '';
+});
+$('#host_ok').click(function(){
+  if(_skey == '')
+    newSession(generateSessionKey());
+  else
+    newSession(_skey);
+  $('#host_cancel').click();
+});
+$('#join').click(function(){
+  $('#action_controls').addClass('hide');
+  $('#join_dialog').removeClass('hide');
+})
+$('#join_cancel').click(function(){
+  $('#action_controls').removeClass('hide');
+  $('#join_dialog').addClass('hide');
+  $('#namej').val('').parent().removeClass('is-dirty');
+  $('#url').val('').parent().removeClass('is-dirty');
+});
+$('#join_ok').click(function(){
+  var name = $('#namej').val();
+  if(name.length == 0)
+    name = 'default';
+  var url = $('#url').val();
+  if(proceedWithUri(name, url)){
+    fetchSessions();
+    $('#join_cancel').click();
+  }
+  else{
+    alert('invalid url');
+  }
+});
+$('#sessionCont').on('click', 'tr td:first-child', function() {
+  sessionKey = $(this).parent().attr('id');
+  window.location.href = window.location.href.split('?')[0] + '?skey=' + sessionKey;
+});
+
+function proceedWithUri(name, url){
+  var sessionKey = getParameterByName('skey', url);
+  if(sessionKey.length != 40 && sessionKey.length != 80)
+    return false;
+  storeSession(sessionKey, name, sessionKey.length == 80 ? true : false);
+  return true;
+}
+
+function storeSession(sessionKey, name, isHost){
+  db = store.getAll();
+  db.sessions[sessionKey] = {
+    name: name,
+    ts: Date.now(),
+    isHost: isHost
+  };
+  store.set('sessions', db.sessions);
+}
+
+function generateSessionKey(){
+  var secret = randString(40);
+  var key = SHA1(secret);
+  return key + secret;
+}
+
+$('#videoContainer').click(function(){
+  $('#video_controls').toggle();
+  $('#controls').toggle();
+});
+
+$('#mvideo').click(function(){
+  var t = $(this).find('.bg24');
+  var toMute = false;
+  if(t.hasClass('mute_video')){
+    t.removeClass('mute_video').addClass('mute_video_off');
+    toMute = true;
+  }
+  else{
+    t.removeClass('mute_video_off').addClass('mute_video');
+    toMute = false;
+  }
+  if(peers[DEFAULT_PEER])
+    peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'video', toMute);
+});
+
+$('#maudio').click(function(){
+  var t = $(this).find('.bg24');
+  var toMute = false;
+  if(t.hasClass('mute_audio')){
+    t.removeClass('mute_audio').addClass('mute_audio_off');
+    toMute = true;
+  }
+  else{
+    t.removeClass('mute_audio_off').addClass('mute_audio');
+    toMute = false;
+  }
+  if(peers[DEFAULT_PEER])
+    peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'audio', toMute);
+})
+
+$('#cam').click(function(){
+  var t = $(this);
+  if(t.hasClass('greyB')){
+    initCamSharing();
+  }
+  $('#screen').removeClass('blueB').addClass('greyB');
+});
+
+$('#screen').click(function(){
+  var t = $(this);
+  if(t.hasClass('greyB')){
+    requestScreenCapture(initScreenSharing);
+  }
+  $('#cam').removeClass('blueB').addClass('greyB');
+});
+
+$('#end_call').click(function(){
+  cleanPeers();
+  window.location.href = window.location.href.split('?')[0];
+});
+
+$('#full_screen').click(function(){
+  var t = $(this).find('.bg36');
+  var toMute = false;
+  if(t.hasClass('gofs'))
+    goFS();
+  else
+    exitFS();
+});
+
+document.addEventListener('webkitfullscreenchange', fsHandler, false);
+document.addEventListener('mozfullscreenchange', fsHandler, false);
+document.addEventListener('fullscreenchange', fsHandler, false);
+document.addEventListener('MSFullscreenChange', fsHandler, false);
+
+function fsHandler() {
+  var t = $('#full_screen').find('.bg36');
+  if(isFullScreen()){
+    t.removeClass('gofs').addClass('exitfs');
+    $('#full_screen_caption').html('Exit Full-Screen');
+  }
+  else{
+    t.removeClass('exitfs').addClass('gofs');
+    $('#full_screen_caption').html('Go Full-Screen');
+  }
+}
+
+function isFullScreen(){
+  var resp = false
+  if(document.fullscreenElement)
+    resp = true;
+  else if(document.webkitFullscreenElement )
+    resp = true;
+  else if (document.mozFullScreenElement)
+    resp = true;
+  return resp
+}
+
+function goFS(){
+  var body = document.body;
+  if (body.requestFullscreen) {
+    body.requestFullscreen();
+  } else if (body.msRequestFullscreen) {
+    body.msRequestFullscreen();
+  } else if (body.mozRequestFullScreen) {
+    body.mozRequestFullScreen();
+  } else if (body.webkitRequestFullscreen) {
+    body.webkitRequestFullscreen();
+  }
+}
+
+function exitFS() {
+  if(document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if(document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if(document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
+
+function initScreenSharing(streamId){
+  $('#screen').removeClass('greyB').addClass('blueB');
+  mediaOptions = {
+    audio: false,
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: streamId,
+        maxWidth: window.screen.width/2,
+        maxHeight: window.screen.height/2,
+      },
+    }
+  }
+  updateHash('video', 'screen');
+  start();
+}
+
+function initCamSharing(){
+  $('#cam').removeClass('greyB').addClass('blueB');
+  mediaOptions = {
+    audio:false,
+    video: {
+      "mandatory": {
+        "minWidth": 640,
+        "maxWidth": 640,
+        "minHeight": 360,
+        "maxHeight": 360,
+        "minFrameRate": 10
+      }
+    }
+  }
+  updateHash('video', 'cam');
+  start();
+}
+
+function startByParams(){
+  var videoSource = getHashParameterByName('video');
+  showCallScreen();
+  if(videoSource == 'cam')
+    initCamSharing();
+  else if(videoSource == 'screen'){
+    setTimeout(function(){
+      requestScreenCapture(initScreenSharing);
+    }, 1000)
+  }
+  else
+    start();
+}
+
+function showCallScreen(){
+  $('#videoContainer').removeClass('hide');
+  $('#controls').removeClass('hide');
+  $('#loader').removeClass('hide');
+  $('#video_controls').addClass('hide');
+  $('#main').addClass('hide');
+  $('#maudio').addClass('hide');
+  $('#mvideo').addClass('hide');
+}
+
+function start(){
+  preserveLocalMediaStream = false;
+  showCallScreen();
+  cleanPeers();
+  if(ws){
+    ws.close();
+  }
+  else
+    startWS();
+}
+
+var iceConnected = false, peers = {}, ws = null, preserveLocalMediaStream = false;
+
+function startWS(){
+  var host = 'awesomertc-boggyb.rhcloud.com:8443/ss/', secure = true;
+  var wsUrl = (secure ? 'wss://' : 'ws://') + host + '?skey=' + sessionKey;
+
+  ws = new WebSocket(wsUrl);
+  ws.onopen = function(e){
+    peerHandler.onChannelOpen();
+  }
+  var reconnect = true;
+  ws.onclose = function(e){
+    peerHandler.onChannelClose();
+    setTimeout(function(){
+      if(reconnect)
+        startWS();
+    },1000);
+  }
+  ws.onmessage = function(e){
+    var json = JSON.parse(e.data);
+    if(peerHandler[json.type])
+      peerHandler[json.type](json.payload);
+    else if(json.type == 'kick')
+      reconnect = false;
+  }
+}
+
+var mediaOptions = {
+  video:false,
+  audio:false,
+}
+
+var DEFAULT_PEER = 'default';
+
+var send = function(type, payload){
+  if(ws && ws.readyState == 1)
+    ws.send(JSON.stringify({type:type, payload:payload}));
+}
+
+var onStream = function(obj, source){
+  window.ms = obj.stream;
+  console.log('got', source, 'stream', 'id', ms.id, ms);
+  if(ms.id == 'default')
+    return;
+  elm = peerApi.attachMediaStreamtoDOM(ms);
+  // elm.setAttribute("controls", "true");
+  elm.className = source;
+  $('#videoContainer').append(elm);
+  if(source == 'local'){
+    elm.muted = true;
+    elm.style.height = '20%'
+    elm.style['z-index'] = 1;
+    // elm.style['min-width'] = 200;
+    elm.style['max-width'] = '50%';
+    elm.style.position = 'absolute';
+    elm.style.bottom = 0;
+    elm.style.right = 0;
+  }
+  else {
+    elm.style.position = 'relative';
+    elm.style['vertical-align'] = 'middle';
+    elm.style.width = '100%';
+    elm.style.height = '100%';
+  }
+}
+
+function cleanPeers(){
+  if(window.localMS){
+    peerApi.stopStreams(window.localMS);
+    window.localMS = null;
+  }
+  for(var id in peers){
+    removePeer(id);
+  }
+}
+
+function removePeer(peerId){
+  connecting();
+  var peer = peers[peerId];
+  if(peer){
+    if(preserveLocalMediaStream)
+      window.localMS = peer.pc.getLocalStreams();
+    else
+      peerApi.stopStreams(peer.pc.getLocalStreams());
+    peerApi.stopStreams(peer.pc.getRemoteStreams());
+    peer.pc.close();
+    $('#videoContainer').empty();
+    delete peers[peerId];
+  }
+}
+
+function onMessage(dcLabel, msg){
+  console.log(dcLabel, msg);
+}
+
+function connecting(){
+  $('#loader').removeClass('hide');
+  $('#video_controls').addClass('hide');
+  $('#maudio').addClass('hide');
+  $('#mvideo').addClass('hide');
+  iceConnected = false;
+}
+
+function connected(){
+  $('#loader').addClass('hide');
+  $('#video_controls').removeClass('hide');
+  $('#maudio').removeClass('hide');
+  $('#mvideo').removeClass('hide');
+  iceConnected = true;
+}
+
+function addPeer(peerId, callback, onmsg){
+  removePeer(peerId);
+  var pc = peerApi.createPeerConnection(send, onStream, function(state){
+    if(state)
+      connected();
+    else
+      removePeer(peerId);
+  });
+  peers[peerId] = {pc:pc}
+  pc.onMessage = onmsg;
+  if(mediaOptions.video || mediaOptions.audio){
+    peerApi.attachStream(pc, mediaOptions, onStream, window.localMS,function(e){
+      preserveLocalMediaStream = true;
+      console.log(e);
+      callback();
+    });
+  }
+  else
+    callback();
+}
+
+var peerHandler = {
+  pcCreated: false,
+  onChannelOpen: function(){
+    if(!iceConnected)
+      send('ready', {});
+  },
+  ready: function(data){
+    addPeer(DEFAULT_PEER, function(){
+      send('offererReady', {});
+    }, onMessage);
+  },
+  onChannelClose: function(){
+    console.log('ws closed');
+  },
+  offererReady: function(){
+    addPeer(DEFAULT_PEER, function(){
+      send('answererReady', {});
+    }, onMessage);
+  },
+  answererReady: function(){
+    peers[DEFAULT_PEER].isOfferer = true;
+    peerApi.createOffer(peers[DEFAULT_PEER].pc, send);
+  },
+  offer: function(data){
+    peers[DEFAULT_PEER].isOfferer = false;
+    peerApi.offer(peers[DEFAULT_PEER].pc, data, send);
+  },
+  answer: function(data){
+    peerApi.answer(peers[DEFAULT_PEER].pc, data, send);
+  },
+  candidate: function(data){
+    peerApi.candidate(peers[DEFAULT_PEER].pc, data, send);
+  }
+}
+
+function getParameterByName(name, url) {
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+  results = regex.exec(url != null ? url : location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getHashParameterByName(name, url) {
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\#&]" + name + "=([^&#]*)"),
+  results = regex.exec(url != null ? url : location.hash);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function updateHash(name, value) {
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  // var re = new RegExp("[\\#&]" + name + "=([^&#]*)");
+  var re = new RegExp("([#&])" + name + "=.*?(&|$)", "i");
+  var hash = location.hash;
+  console.log(hash);
+  if(hash.match(re)){
+    hash = hash.replace(re, '$1' + name + "=" + value + '$2')
+  }
+  else
+    hash = hash + (hash.length > 1 ? '&' : '') + name + '=' + value; 
+  window.location.hash = hash;
+}
+
+function randString(length) {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879";
+  var string = "";
+  for (var x = 0; x < length; x++) {
+      var i = Math.floor(Math.random() * chars.length);
+      string += chars.charAt(i);
+  }
+  return string;
+}
+
+function SHA1(r){function o(r,o){var e=r<<o|r>>>32-o;return e}function e(r){var o,e,a="";for(o=7;o>=0;o--)e=r>>>4*o&15,a+=e.toString(16);return a}function a(r){r=r.replace(/\r\n/g,"\n");for(var o="",e=0;e<r.length;e++){var a=r.charCodeAt(e);128>a?o+=String.fromCharCode(a):a>127&&2048>a?(o+=String.fromCharCode(a>>6|192),o+=String.fromCharCode(63&a|128)):(o+=String.fromCharCode(a>>12|224),o+=String.fromCharCode(a>>6&63|128),o+=String.fromCharCode(63&a|128))}return o}var t,h,n,C,c,f,d,A,u,g=new Array(80),i=1732584193,s=4023233417,S=2562383102,v=271733878,m=3285377520;r=a(r);var p=r.length,l=new Array;for(h=0;p-3>h;h+=4)n=r.charCodeAt(h)<<24|r.charCodeAt(h+1)<<16|r.charCodeAt(h+2)<<8|r.charCodeAt(h+3),l.push(n);switch(p%4){case 0:h=2147483648;break;case 1:h=r.charCodeAt(p-1)<<24|8388608;break;case 2:h=r.charCodeAt(p-2)<<24|r.charCodeAt(p-1)<<16|32768;break;case 3:h=r.charCodeAt(p-3)<<24|r.charCodeAt(p-2)<<16|r.charCodeAt(p-1)<<8|128}for(l.push(h);l.length%16!=14;)l.push(0);for(l.push(p>>>29),l.push(p<<3&4294967295),t=0;t<l.length;t+=16){for(h=0;16>h;h++)g[h]=l[t+h];for(h=16;79>=h;h++)g[h]=o(g[h-3]^g[h-8]^g[h-14]^g[h-16],1);for(C=i,c=s,f=S,d=v,A=m,h=0;19>=h;h++)u=o(C,5)+(c&f|~c&d)+A+g[h]+1518500249&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=20;39>=h;h++)u=o(C,5)+(c^f^d)+A+g[h]+1859775393&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=40;59>=h;h++)u=o(C,5)+(c&f|c&d|f&d)+A+g[h]+2400959708&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=60;79>=h;h++)u=o(C,5)+(c^f^d)+A+g[h]+3395469782&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;i=i+C&4294967295,s=s+c&4294967295,S=S+f&4294967295,v=v+d&4294967295,m=m+A&4294967295}var u=e(i)+e(s)+e(S)+e(v)+e(m);return u.toLowerCase()}
+
+fetchSessions();
+init();
+
+var extensionInstalled = false;
+function requestScreenCapture(cb){
+  if (!extensionInstalled){
+    var message = 'Please install the extension:\n' +
+                  '1. Go to chrome://extensions\n' +
+                  '2. Check: "Enable Developer mode"\n' +
+                  '3. Click: "Load the unpacked extension..."\n' +
+                  '4. Choose "extension" folder from the repository\n' +
+                  '5. Reload this page';
+    alert(message);
+  }
+  else{
+    window.screenCallback = cb;
+    window.postMessage({ type: 'SS_UI_REQUEST', text: 'start' }, '*');
+  }
+};
+
+// listen for messages from the content-script
+window.addEventListener('message', function (event) {
+  if (event.origin != window.location.origin) return;
+
+  // content-script will send a 'SS_PING' msg if extension is installed
+  if (event.data.type && (event.data.type === 'SS_PING')) {
+    extensionInstalled = true;
+  }
+
+  // user chose a stream
+  if (event.data.type && (event.data.type === 'SS_DIALOG_SUCCESS')) {
+    if(window.screenCallback){
+      window.screenCallback(event.data.streamId);
+    }
+  }
+
+  // user clicked on 'cancel' in choose media dialog
+  if (event.data.type && (event.data.type === 'SS_DIALOG_CANCEL')) {
+    console.log('User cancelled!');
+  }
+});
+
+</script>
+</html>
