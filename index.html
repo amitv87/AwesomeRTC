@@ -508,11 +508,12 @@ function startWS(){
   ws.onopen = function(e){
     peerHandler.onChannelOpen();
   }
-  var reconnect = true;
+  window.reconnect = true;
   ws.onclose = function(e){
     peerHandler.onChannelClose();
+    if(window.reconnect)
     setTimeout(function(){
-      if(reconnect)
+      if(window.reconnect)
         startWS();
     },1000);
   }
@@ -521,7 +522,7 @@ function startWS(){
     if(peerHandler[json.type])
       peerHandler[json.type](json.payload);
     else if(json.type == 'kick')
-      reconnect = false;
+      window.reconnect = false;
   }
 }
 
@@ -762,6 +763,12 @@ else{
       }
     });
   }
+  window.onbeforeunload = function(e){
+    if(ws && ws.readyState == 1){
+      window.reconnect = false;
+      ws.close();
+    }
+  };
 }
 
 </script>

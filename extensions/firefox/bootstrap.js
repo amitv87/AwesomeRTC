@@ -6,7 +6,7 @@
 var require = Components.utils.import("resource://gre/modules/commonjs/toolkit/require.js", {}).require;
 var tabs = require("sdk/tabs");
 
-var domains = ["amitv87.github.io", 'localhost:8083'];
+var domains = ["amitv87.github.io"];
 var addon_domains = []; // list of domains the addon added
 var PREF = "media.getusermedia.screensharing.allowed_domains";
 
@@ -25,7 +25,6 @@ function setPermission(tab, flag){
   var state = false;
   domains.forEach(function(domain){
     if (tab.url.indexOf(domain) != -1) {
-      console.log(domain, tab.url);
       state = true;
     }
   });
