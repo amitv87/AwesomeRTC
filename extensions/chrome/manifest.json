@@ -1,6 +1,8 @@
 {
-  "name": "AwesomeRTC",
-  "description": "AwesomeRTC Screen Sharing Extension",
+  "name": "Awesome RTC",
+  "short_name": "Awesome RTC",
+  "description": "Awesome RTC Screen Sharing Extension",
+  "homepage_url": "https://amitv87.github.io/AwesomeRTC/",
   "version": "1.0.0",
   "manifest_version": 2,
   "icons": {
