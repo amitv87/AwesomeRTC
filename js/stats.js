@@ -1,25 +1,8 @@
-// var arr = []
-
-var rtcStats = {};
-
-function sendJunk(){
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-  sendOverDC({hi:123123123});sendOverDC({hi:123123123});
-}
-
-var collectStats = function(){
-  // sendJunk();
+var collectStats = function(pc, rtcStats, cb){
   pc.getStats(function(e){
     var ts = new Date();
     var statsResp = e;
     var results = statsResp.result();
-
     results.forEach(function(r){
       if(!rtcStats[r.type])
         rtcStats[r.type] = {}
@@ -29,7 +12,7 @@ var collectStats = function(){
       var names = namedItem.names();
       names.forEach(function(name){
         var value = namedItem.stat(name);
-        if(value && !isNaN(value)){
+        if(!isNaN(value)){
           if(!rtcStats[r.type][r.id][name])
             rtcStats[r.type][r.id][name] = []
           rtcStats[r.type][r.id][name].push({
@@ -39,23 +22,23 @@ var collectStats = function(){
           if(rtcStats[r.type][r.id][name].length > 300)
             rtcStats[r.type][r.id][name].shift();
         }
+        else
+          rtcStats[r.type][r.id][name] = value;
+
       });
-    })
+    });
+    if(cb)
+      cb();
   });
 }
-setTimeout(function(){
-  setInterval(collectStats,100);
-  setTimeout(function(){
-    // window.dp = rtcStats['googCandidatePair']['Conn-audio-1-0']['googRtt']
-    // window.br = new Chart('googRtt', 'Conn-audio-1-0', 'googRtt', dp);
-  },500)
-}, 5000);
 
-
-function Chart(name, id, unit, keyValueArray){
-  var h = document.getElementById('holder');
+function Chart(name, id, unit, keyValueArray, renderInterval, holder){
+  if(isNaN(renderInterval)) renderInterval = 500;
   var target = document.createElement('div');
-  h.appendChild(target);
+  target.style.width = 400;
+  target.style.height = 300;
+  holder.appendChild(target);
+
   target.id = id + '_' + name;
   var dps = []; 
   var chart = new CanvasJS.Chart(target.id,{
@@ -73,8 +56,8 @@ function Chart(name, id, unit, keyValueArray){
       dataPoints: keyValueArray 
     }]
   });
-  var job = setInterval(chart.render, 100);
-  return {
+  var job = setInterval(chart.render, renderInterval);
+  var actions = {
     stop: function(){
       clearInterval(job);
     },
@@ -84,35 +67,17 @@ function Chart(name, id, unit, keyValueArray){
     },
     start: function(){
       this.stop();
-      job = setInterval(chart.render, 100);
+      job = setInterval(chart.render, renderInterval);
     },
     chart: chart
   }
+  var close_target = document.createElement('button');
+  close_target.style.position = 'relative';
+  close_target.style.cursor = 'pointer';
+  close_target.textContent = 'X';
+  target.appendChild(close_target);
+  close_target.onclick = function(e){
+    actions.clear();
+  }
+  return actions;
 }
-// var dp = rtcStats['googCandidatePair']['Conn-video-1-0']['bytesReceived']
-// var br = new Chart('bytesReceived', 'Conn-video-1-0', 'bytes', dp);
-// var dp = rtcStats['googCandidatePair']['Conn-video-1-0']['bytesSent']
-// var bs = new Chart('bytesSent', 'Conn-video-1-0', 'bytes', dp);
-
-// dataPoints
-// var chart = new CanvasJS.Chart("demo",{
-//   title :{
-//     text: "Live Random Data"
-//   },      
-//   data: [{
-//     type: "line",
-//     dataPoints: dps 
-//   }]
-// });
-
-var xVal = 0;
-var yVal = 100; 
-var updateInterval = 100;
-var dataLength = 10000; // number of dataPoints visible at any point
-
-
-
-// updateChart(); 
-//   setInterval(function(){updateChart()}, updateInterval);
-
-// frame stats: length=115207 size=115200 width=320 height=240
