@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>AwesomeRTC</title>
+  <title>Awesome RTC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <link rel="shortcut icon" type="image/x-icon" href="css/favicon.ico">
   <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -119,6 +119,9 @@
 <script type="text/javascript" src="js/peerApi.js"></script>
 <script type="text/javascript">
 
+var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
 var cp = new Clipboard('#copy');
 cp.on('success', function(e) {
   $('#copy').text('Copied');
@@ -226,51 +229,6 @@ function newSession(skey){
   fetchSessions();
 }
 
-$('#host').click(function(){
-  $('#action_controls').addClass('hide');
-  $('#host_dialog').removeClass('hide');
-});
-$('#host_cancel').click(function(){
-  $('#action_controls').removeClass('hide');
-  $('#host_dialog').addClass('hide');
-  $('#nameh').val('').parent().removeClass('is-dirty');
-  _skey = '';
-});
-$('#host_ok').click(function(){
-  if(_skey == '')
-    newSession(generateSessionKey());
-  else
-    newSession(_skey);
-  $('#host_cancel').click();
-});
-$('#join').click(function(){
-  $('#action_controls').addClass('hide');
-  $('#join_dialog').removeClass('hide');
-})
-$('#join_cancel').click(function(){
-  $('#action_controls').removeClass('hide');
-  $('#join_dialog').addClass('hide');
-  $('#namej').val('').parent().removeClass('is-dirty');
-  $('#url').val('').parent().removeClass('is-dirty');
-});
-$('#join_ok').click(function(){
-  var name = $('#namej').val();
-  if(name.length == 0)
-    name = 'default';
-  var url = $('#url').val();
-  if(proceedWithUri(name, url)){
-    fetchSessions();
-    $('#join_cancel').click();
-  }
-  else{
-    alert('invalid url');
-  }
-});
-$('#sessionCont').on('click', 'tr td:first-child', function() {
-  sessionKey = $(this).parent().attr('id');
-  window.location.href = window.location.href.split('?')[0] + '?skey=' + sessionKey;
-});
-
 function proceedWithUri(name, url){
   var sessionKey = getParameterByName('skey', url);
   if(sessionKey.length != 40 && sessionKey.length != 80)
@@ -295,71 +253,118 @@ function generateSessionKey(){
   return key + secret;
 }
 
-$('#videoContainer').click(function(){
-  $('#video_controls').toggle();
-  $('#controls').toggle();
-});
+function bindControls(){
+  $('#host').click(function(){
+    $('#action_controls').addClass('hide');
+    $('#host_dialog').removeClass('hide');
+  });
+  $('#host_cancel').click(function(){
+    $('#action_controls').removeClass('hide');
+    $('#host_dialog').addClass('hide');
+    $('#nameh').val('').parent().removeClass('is-dirty');
+    _skey = '';
+  });
+  $('#host_ok').click(function(){
+    if(_skey == '')
+      newSession(generateSessionKey());
+    else
+      newSession(_skey);
+    $('#host_cancel').click();
+  });
+  $('#join').click(function(){
+    $('#action_controls').addClass('hide');
+    $('#join_dialog').removeClass('hide');
+  })
+  $('#join_cancel').click(function(){
+    $('#action_controls').removeClass('hide');
+    $('#join_dialog').addClass('hide');
+    $('#namej').val('').parent().removeClass('is-dirty');
+    $('#url').val('').parent().removeClass('is-dirty');
+  });
+  $('#join_ok').click(function(){
+    var name = $('#namej').val();
+    if(name.length == 0)
+      name = 'default';
+    var url = $('#url').val();
+    if(proceedWithUri(name, url)){
+      fetchSessions();
+      $('#join_cancel').click();
+    }
+    else{
+      alert('invalid url');
+    }
+  });
+  $('#sessionCont').on('click', 'tr td:first-child', function() {
+    sessionKey = $(this).parent().attr('id');
+    window.location.href = window.location.href.split('?')[0] + '?skey=' + sessionKey;
+  });
 
-$('#mvideo').click(function(){
-  var t = $(this).find('.bg24');
-  var toMute = false;
-  if(t.hasClass('mute_video')){
-    t.removeClass('mute_video').addClass('mute_video_off');
-    toMute = true;
-  }
-  else{
-    t.removeClass('mute_video_off').addClass('mute_video');
-    toMute = false;
-  }
-  if(peers[DEFAULT_PEER])
-    peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'video', toMute);
-});
 
-$('#maudio').click(function(){
-  var t = $(this).find('.bg24');
-  var toMute = false;
-  if(t.hasClass('mute_audio')){
-    t.removeClass('mute_audio').addClass('mute_audio_off');
-    toMute = true;
-  }
-  else{
-    t.removeClass('mute_audio_off').addClass('mute_audio');
-    toMute = false;
-  }
-  if(peers[DEFAULT_PEER])
-    peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'audio', toMute);
-})
+  $('#videoContainer').click(function(){
+    $('#video_controls').toggle();
+    $('#controls').toggle();
+  });
 
-$('#cam').click(function(){
-  var t = $(this);
-  if(t.hasClass('greyB')){
-    initCamSharing();
-  }
-  $('#screen').removeClass('blueB').addClass('greyB');
-});
+  $('#mvideo').click(function(){
+    var t = $(this).find('.bg24');
+    var toMute = false;
+    if(t.hasClass('mute_video')){
+      t.removeClass('mute_video').addClass('mute_video_off');
+      toMute = true;
+    }
+    else{
+      t.removeClass('mute_video_off').addClass('mute_video');
+      toMute = false;
+    }
+    if(peers[DEFAULT_PEER])
+      peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'video', toMute);
+  });
 
-$('#screen').click(function(){
-  var t = $(this);
-  if(t.hasClass('greyB')){
-    requestScreenCapture(initScreenSharing);
-  }
-  $('#cam').removeClass('blueB').addClass('greyB');
-});
+  $('#maudio').click(function(){
+    var t = $(this).find('.bg24');
+    var toMute = false;
+    if(t.hasClass('mute_audio')){
+      t.removeClass('mute_audio').addClass('mute_audio_off');
+      toMute = true;
+    }
+    else{
+      t.removeClass('mute_audio_off').addClass('mute_audio');
+      toMute = false;
+    }
+    if(peers[DEFAULT_PEER])
+      peerApi.toggleMute(peers[DEFAULT_PEER].pc, 'audio', toMute);
+  })
 
-$('#end_call').click(function(){
-  cleanPeers();
-  window.location.href = window.location.href.split('?')[0];
-});
+  $('#cam').click(function(){
+    var t = $(this);
+    if(t.hasClass('greyB')){
+      initCamSharing();
+    }
+    $('#screen').removeClass('blueB').addClass('greyB');
+  });
 
-$('#full_screen').click(function(){
-  var t = $(this).find('.bg36');
-  var toMute = false;
-  if(t.hasClass('gofs'))
-    goFS();
-  else
-    exitFS();
-});
+  $('#screen').click(function(){
+    var t = $(this);
+    if(t.hasClass('greyB')){
+      requestScreenCapture(initScreenSharing);
+    }
+    $('#cam').removeClass('blueB').addClass('greyB');
+  });
 
+  $('#end_call').click(function(){
+    cleanPeers();
+    window.location.href = window.location.href.split('?')[0];
+  });
+
+  $('#full_screen').click(function(){
+    var t = $(this).find('.bg36');
+    var toMute = false;
+    if(t.hasClass('gofs'))
+      goFS();
+    else
+      exitFS();
+  });
+}
 document.addEventListener('webkitfullscreenchange', fsHandler, false);
 document.addEventListener('mozfullscreenchange', fsHandler, false);
 document.addEventListener('fullscreenchange', fsHandler, false);
@@ -413,17 +418,29 @@ function exitFS() {
 
 function initScreenSharing(streamId){
   $('#screen').removeClass('greyB').addClass('blueB');
-  mediaOptions = {
-    audio: false,
-    video: {
-      mandatory: {
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: streamId,
-        maxWidth: window.screen.width,
-        maxHeight: window.screen.height,
-      },
+  if(is_chrome){
+    mediaOptions = {
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: streamId,
+          maxWidth: window.screen.width,
+          maxHeight: window.screen.height,
+        },
+      }
     }
   }
+  else if(is_firefox){
+    mediaOptions = {
+      audio: false,
+      video: {
+        // mozMediaSource: 'window',
+        mediaSource: 'window'
+      }
+    }
+  }
+  console.log('mediaOptions', mediaOptions);
   updateHash('video', 'screen');
   start();
 }
@@ -688,43 +705,64 @@ function randString(length) {
 
 function SHA1(r){function o(r,o){var e=r<<o|r>>>32-o;return e}function e(r){var o,e,a="";for(o=7;o>=0;o--)e=r>>>4*o&15,a+=e.toString(16);return a}function a(r){r=r.replace(/\r\n/g,"\n");for(var o="",e=0;e<r.length;e++){var a=r.charCodeAt(e);128>a?o+=String.fromCharCode(a):a>127&&2048>a?(o+=String.fromCharCode(a>>6|192),o+=String.fromCharCode(63&a|128)):(o+=String.fromCharCode(a>>12|224),o+=String.fromCharCode(a>>6&63|128),o+=String.fromCharCode(63&a|128))}return o}var t,h,n,C,c,f,d,A,u,g=new Array(80),i=1732584193,s=4023233417,S=2562383102,v=271733878,m=3285377520;r=a(r);var p=r.length,l=new Array;for(h=0;p-3>h;h+=4)n=r.charCodeAt(h)<<24|r.charCodeAt(h+1)<<16|r.charCodeAt(h+2)<<8|r.charCodeAt(h+3),l.push(n);switch(p%4){case 0:h=2147483648;break;case 1:h=r.charCodeAt(p-1)<<24|8388608;break;case 2:h=r.charCodeAt(p-2)<<24|r.charCodeAt(p-1)<<16|32768;break;case 3:h=r.charCodeAt(p-3)<<24|r.charCodeAt(p-2)<<16|r.charCodeAt(p-1)<<8|128}for(l.push(h);l.length%16!=14;)l.push(0);for(l.push(p>>>29),l.push(p<<3&4294967295),t=0;t<l.length;t+=16){for(h=0;16>h;h++)g[h]=l[t+h];for(h=16;79>=h;h++)g[h]=o(g[h-3]^g[h-8]^g[h-14]^g[h-16],1);for(C=i,c=s,f=S,d=v,A=m,h=0;19>=h;h++)u=o(C,5)+(c&f|~c&d)+A+g[h]+1518500249&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=20;39>=h;h++)u=o(C,5)+(c^f^d)+A+g[h]+1859775393&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=40;59>=h;h++)u=o(C,5)+(c&f|c&d|f&d)+A+g[h]+2400959708&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;for(h=60;79>=h;h++)u=o(C,5)+(c^f^d)+A+g[h]+3395469782&4294967295,A=d,d=f,f=o(c,30),c=C,C=u;i=i+C&4294967295,s=s+c&4294967295,S=S+f&4294967295,v=v+d&4294967295,m=m+A&4294967295}var u=e(i)+e(s)+e(S)+e(v)+e(m);return u.toLowerCase()}
 
-fetchSessions();
-init();
-
 var extensionInstalled = false;
+
 function requestScreenCapture(cb){
-  if (!extensionInstalled){
+  if(is_firefox){
+    if($('body').attr('ei') == 'true')
+      extensionInstalled = true;
+    else
+      extensionInstalled = false;
+  }
+
+  if(!extensionInstalled){
     console.log('extension not installed');
     if(window.chrome)
       chrome.webstore.install();
+    else
+      console.log('extension not installed');
   }
   else{
-    window.screenCallback = cb;
-    window.postMessage({ type: 'AwesomeRTC_UI_REQUEST', text: 'start' }, '*');
+    if(is_chrome){
+      window.screenCallback = cb;
+      window.postMessage({ type: 'AwesomeRTC_UI_REQUEST', text: 'start' }, '*');
+    }
+    else if(is_firefox)
+      cb();
   }
 };
 
 // listen for messages from the content-script
-window.addEventListener('message', function (event) {
-  if (event.origin != window.location.origin) return;
 
-  // content-script will send a 'SS_PING' msg if extension is installed
-  if (event.data.type && (event.data.type === 'AwesomeRTC_PING')) {
-    extensionInstalled = true;
-  }
+if(!is_chrome && !is_firefox)
+ alert('Browser not supported');
+else{
+  fetchSessions();
+  init();
+  bindControls();
+  if(is_chrome){
+    window.addEventListener('message', function (event) {
+      if (event.origin != window.location.origin) return;
 
-  // user chose a stream
-  if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_SUCCESS')) {
-    if(window.screenCallback){
-      window.screenCallback(event.data.streamId);
-    }
-  }
+      // content-script will send a 'SS_PING' msg if extension is installed
+      if (event.data.type && (event.data.type === 'AwesomeRTC_PING')) {
+        extensionInstalled = true;
+      }
 
-  // user clicked on 'cancel' in choose media dialog
-  if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_CANCEL')) {
-    console.log('User cancelled!');
+      // user chose a stream
+      if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_SUCCESS')) {
+        if(window.screenCallback){
+          window.screenCallback(event.data.streamId);
+        }
+      }
+
+      // user clicked on 'cancel' in choose media dialog
+      if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_CANCEL')) {
+        console.log('User cancelled!');
+      }
+    });
   }
-});
+}
 
 </script>
 </html>
