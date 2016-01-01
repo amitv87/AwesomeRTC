@@ -703,7 +703,7 @@ function requestScreenCapture(cb){
   }
   else{
     window.screenCallback = cb;
-    window.postMessage({ type: 'SS_UI_REQUEST', text: 'start' }, '*');
+    window.postMessage({ type: 'AwesomeRTC_UI_REQUEST', text: 'start' }, '*');
   }
 };
 
@@ -712,19 +712,19 @@ window.addEventListener('message', function (event) {
   if (event.origin != window.location.origin) return;
 
   // content-script will send a 'SS_PING' msg if extension is installed
-  if (event.data.type && (event.data.type === 'SS_PING')) {
+  if (event.data.type && (event.data.type === 'AwesomeRTC_PING')) {
     extensionInstalled = true;
   }
 
   // user chose a stream
-  if (event.data.type && (event.data.type === 'SS_DIALOG_SUCCESS')) {
+  if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_SUCCESS')) {
     if(window.screenCallback){
       window.screenCallback(event.data.streamId);
     }
   }
 
   // user clicked on 'cancel' in choose media dialog
-  if (event.data.type && (event.data.type === 'SS_DIALOG_CANCEL')) {
+  if (event.data.type && (event.data.type === 'AwesomeRTC_DIALOG_CANCEL')) {
     console.log('User cancelled!');
   }
 });

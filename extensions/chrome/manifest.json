@@ -1,0 +1,27 @@
+{
+  "name": "AwesomeRTC",
+  "description": "AwesomeRTC Screen Sharing Extension",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "64": "icons/icon64.png",
+    "96": "icons/icon96.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://amitv87.github.io/AwesomeRTC/*", "https://amitv87.github.io/AwesomeRTC/*"],
+      "js": ["content-script.js"]
+    }
+  ],
+  "permissions": [
+    "desktopCapture",
+    "http://amitv87.github.io/AwesomeRTC/*",
+    "https://amitv87.github.io/AwesomeRTC/*"
+  ]
+}
