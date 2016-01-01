@@ -38,3 +38,14 @@ function cancelScreenSharing(msg) {
      chrome.desktopCapture.cancelChooseDesktopMedia(desktopMediaRequestId);
   }
 }
+
+var manifest = chrome.runtime.getManifest();
+var urls = manifest.content_scripts[0].matches;
+
+chrome.tabs.query({ url: urls }, function(tabs)
+{
+    for(var i = 0; i < tabs.length; i++)
+    {
+        chrome.tabs.executeScript(tabs[i].id, { file: "content-script.js" }, function() {});
+    }
+});

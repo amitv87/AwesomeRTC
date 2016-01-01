@@ -20,6 +20,7 @@
     }
   ],
   "permissions": [
+    "tabs",
     "desktopCapture",
     "http://amitv87.github.io/AwesomeRTC/*",
     "https://amitv87.github.io/AwesomeRTC/*"
