@@ -5,6 +5,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="css/favicon.ico">
   <link rel="stylesheet" type="text/css" href="css/style.css"/>
   <link rel="stylesheet" type="text/css" href="css/material.min.css"/>
+  <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/fdillhpnhjaoimfadjapbbddkdgfeedl">
 </head>
 <body>
   <div id="videoContainer" class="hide"></div>
@@ -693,13 +694,9 @@ init();
 var extensionInstalled = false;
 function requestScreenCapture(cb){
   if (!extensionInstalled){
-    var message = 'Please install the extension:\n' +
-                  '1. Go to chrome://extensions\n' +
-                  '2. Check: "Enable Developer mode"\n' +
-                  '3. Click: "Load the unpacked extension..."\n' +
-                  '4. Choose "extension" folder from the repository\n' +
-                  '5. Reload this page';
-    alert(message);
+    console.log('extension not installed');
+    if(window.chrome)
+      chrome.webstore.install();
   }
   else{
     window.screenCallback = cb;
