@@ -5,7 +5,7 @@ var peerApi = {
   getUserMedia: navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia,
   server: {
     iceServers: [
-      {url:'stun:stun.l.google.com:19302', urls: 'stun:stun.l.google.com:19302'},
+      {url:'stun:stun.l.google.com:19302', urls: 'stun:stun.l.google.com:19302'}
     ],
     iceTransportType: 'all',
     bundlePolicy: 'balanced',
@@ -14,15 +14,10 @@ var peerApi = {
   options: {
     'optional': [
       {'DtlsSrtpKeyAgreement': true},
-      {'internalSctpDataChannels': true},
-      // {'RtpDataChannels': true}
+      {'internalSctpDataChannels': true}
     ]
   },
   constraints: {
-    // mandatory: {
-    //   OfferToReceiveAudio: true,
-    //   OfferToReceiveVideo: true
-    // },
     "offerToReceiveAudio":true,
     "offerToReceiveVideo":true
   },
@@ -36,6 +31,7 @@ var peerApi = {
     pc.onicecandidate = function(e) {
       if (e.candidate == null)
         return;
+      // console.log('onicecandidate', e.candidate.candidate);
       sdpExchCB("candidate", e.candidate);
     };
     pc.oniceconnectionstatechange = pc.onicechange = function(e){
@@ -45,6 +41,9 @@ var peerApi = {
       if(pc.iceConnectionState == 'disconnected' || e == 'disconnected')
         onConnectionState(false);
     };
+
+    pc.onConnectionState = onConnectionState;
+
     pc.onnegotiationneeded = function(e){
       console.log('onnegotiationneeded', e);
     };
@@ -105,6 +104,10 @@ var peerApi = {
     dc.onmessage = function(e){
       pc.onMessage(this.label, JSON.parse(e.data));
     }
+    dc.onclose = function(e){
+      console.log('dc onclose')
+      pc.onConnectionState(false);
+    }
     this.sendOverDC(dc, {ack: 'hi from browser'});
   },
   offer: function(pc, data, sdpExchCB) {
@@ -119,6 +122,7 @@ var peerApi = {
     }, self.errorHandler);
   },
   candidate: function(pc, data, sdpExchCB) {
+    // console.log('onaddicecandidate', data);
     pc.addIceCandidate(new this.IceCandidate(data));
   },
   answer: function(pc, data, sdpExchCB) {
