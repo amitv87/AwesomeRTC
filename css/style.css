@@ -11,6 +11,10 @@ body {
   background-color:rgba(220, 220, 220, 0.8)!important;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body, div
 {
   -webkit-touch-callout: none;
@@ -65,6 +69,39 @@ td button{
   background: #FAFAFA;
 }
 
+#mc{
+  width: 100%;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  -ms-transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  transition: all 0.5s;
+}
+
+#chatBox{
+  position: fixed;
+  right:0;
+  height: 100%;
+  width: 0%;
+  transition: all 0.5s;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  /*pointer-events: all;*/
+}
+
+#chatBox * {
+  -webkit-touch-callout: all;
+  -webkit-user-select: all;
+  -khtml-user-select: all;
+  -moz-user-select: -moz-all;
+  -ms-user-select: all;
+  -o-user-select: all;
+  user-select: all;
+}
+
 #video_controls{
   width: 100%;
   height: 10%;
@@ -88,11 +125,14 @@ td button{
 }
 
 #video_controls table{
-  float: right;
+  /*float: right;
   vertical-align: middle;
   height: 100%;
   margin-right: 20px;
-  margin-top: 10px;
+  margin-top: 10px;*/
+  position: fixed;
+  right: 20px;
+  top: 10px;
 }
 
 table td{
@@ -131,15 +171,17 @@ video{
 }
 
 #full_screen{
-  /*background-color:#ffb93e!important;*/
-  background-color: rgba(83, 109, 254, 0.6);
+  /*background-color: rgba(83, 109, 254, 0.6);*/
   pointer-events: all;
   width: 40px;
   height: 40px;
   min-width: 40px;
+}
+
+#access{
   position: absolute;
-  left: 30px;
-  bottom: 30px;
+  left: 0px;
+  bottom: 0px;
 }
 
 #end_call{
@@ -176,6 +218,10 @@ video{
 
 .screen{
   background-image: url('icons/ic_cast_white_24dp.png');
+}
+
+.chat{
+  background-image: url('icons/ic_chat_white_24dp.png');
 }
 
 .icon_share{
@@ -236,6 +282,7 @@ video{
 #sessionName{
   float:left;
   padding:30px;
+  position: fixed;
   color:white;
   font-size:24px;
   text-shadow: 0px 0px 10px black;
@@ -243,4 +290,162 @@ video{
 
 *:focus {
   outline: 0;
+}
+
+/* chat styles */
+
+.overflowScroll{
+  overflow-x: hidden;
+}
+
+#chat_input {
+  width: 100%;
+  resize: none;
+  outline: none;
+  max-height:80px!important;
+  min-height:38px;
+  font-size: 13px!important;
+  border: 1px solid #8F98A0;
+  outline: none;
+  border-radius: 5px;
+  padding: 10px;
+  color: #2c3e50;
+  margin: 0px!important;
+  background-color: white!important;
+  -ms-overflow-style: none;
+  line-height: 16px!important;
+  overflow-x: hidden;
+  -webkit-transition: height 0.2s;
+  -moz-transition: height 0.2s;
+  transition: height 0.2s;
+}
+#chat_input:focus{
+  border-color: #2c3e50;
+  box-shadow: 0px 0px 2px #2c3e50;
+}
+
+#chat_input_con{
+  width: 100%;
+  line-height: 0;
+  padding: 10px;
+}
+.footer {
+  display: table-row;
+  /*background: lightgray;*/
+}
+.cv_base_sent {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.cv_msg_sent > time{
+  float: right;
+}
+
+.cv_msg_receive > time {
+  float: left;
+}
+
+/*.cv_msg_container_base::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #F5F5F5;
+}
+
+.cv_msg_container_base::-webkit-scrollbar {
+  width: 12px;
+  background-color: #F5F5F5;
+}
+
+.cv_msg_container_base::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #2c3e50;
+}*/
+.__cv_m {
+  float: right;
+}
+.cv_messages {
+  background: white;
+  padding: 10px;
+  /*border-radius: 2px;*/
+  /*box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);*/
+  width:85%;
+  word-wrap: break-word;
+}
+.cv_messages p{
+  line-height: 16px;
+}
+.cv_msg_receive{
+  /*padding-left:0;*/
+  margin-left:0;
+  border-radius: 0px 15px 15px 15px;
+}
+.cv_msg_sent{
+  /*padding-bottom:20px !important;*/
+  margin-right:0;
+  border-radius: 15px 15px 0px 15px;
+}
+
+.cv_messages > p {
+  font-size: 13px;
+  margin: 0 0 0.2rem 0;
+}
+.cv_messages > time {
+  font-size: 11px;
+  color: #ccc;
+}
+.cv_msg_container {
+  padding: 10px 0px 0px 0px;
+  overflow: hidden;
+  display: flex;
+  width: auto;
+}
+
+.__cv_checkmark {
+  display:inline-block;
+  margin-top: -6px;
+  width: 13px;
+  height: 18px;
+  -webkit-transform:rotate(45deg);
+  -moz-transform:rotate(45deg);
+  -ms-transform:rotate(45deg);
+  -o-transform:rotate(45deg);
+  transform:rotate(45deg);
+}
+
+.__cv_checkmark_stem {
+  position: absolute;
+  width:3px;
+  height:9px;
+  background-color:#ccc;
+  left:11px;
+  top:6px;
+}
+
+.__cv_checkmark_kick {
+  position: absolute;
+  width:3px;
+  height:3px;
+  background-color:#ccc;
+  left:8px;
+  top:12px;
+}
+
+
+.__cv_date_cont {
+  padding-top: 10px;
+  display: flex;
+}
+
+.__cv_date {
+  background-color: #A9C1D0;
+  width: 50%;
+  text-align: center!important;
+  border-radius: 0px 8px 8px 0px;
+  overflow: hidden;
+}
+
+.__cv_date p {
+  padding: 0px;
+  font-size: 13px!important;
+  text-align: center!important;
+  margin: 0.2rem 0.4rem 0.2rem 0.4rem!important;
 }

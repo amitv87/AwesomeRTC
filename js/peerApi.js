@@ -102,7 +102,8 @@ var peerApi = {
     var label = dc.label;
     pc.dcs[label] = dc;
     dc.onmessage = function(e){
-      pc.onMessage(this.label, JSON.parse(e.data));
+      if(pc.onMessage)
+        pc.onMessage(this.label, JSON.parse(e.data));
     }
     dc.onclose = function(e){
       console.log('dc onclose')
