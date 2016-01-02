@@ -785,8 +785,12 @@ var peerHandler = {
     }, onMessage);
   },
   answererReady: function(){
-    peers[DEFAULT_PEER].isOfferer = true;
-    peerApi.createOffer(peers[DEFAULT_PEER].pc, send);
+    if(peers[DEFAULT_PEER]){
+      peers[DEFAULT_PEER].isOfferer = true;
+      peerApi.createOffer(peers[DEFAULT_PEER].pc, send);
+    }
+    else
+      this.ready();
   },
   offer: function(data){
     peers[DEFAULT_PEER].isOfferer = false;
