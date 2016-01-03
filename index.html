@@ -173,6 +173,7 @@ if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 
 if(is_mobile){
   $('#screen').parent().addClass('hide');
+  $('#option-2').parent().addClass('hide');
 }
 
 var cp = new Clipboard('#copy');
@@ -890,10 +891,7 @@ var extensionInstalled = false;
 
 function requestScreenCapture(cbs, cbf){
   if(is_firefox){
-    if($('body').attr('ei') == 'true')
-      extensionInstalled = true;
-    else
-      extensionInstalled = false;
+    detectExtensionFF();
   }
 
   if(!extensionInstalled){
@@ -918,6 +916,13 @@ function requestScreenCapture(cbs, cbf){
   }
 };
 
+
+function detectExtensionFF(){
+  if($('body').attr('ei') == 'true')
+    extensionInstalled = true;
+  else
+    extensionInstalled = false;
+}
 // listen for messages from the content-script
 
 var chatCounter = 1, day = '';
@@ -948,9 +953,6 @@ else{
         console.log('User cancelled!');
       }
     });
-  }
-  else if(is_firefox){
-
   }
   fetchSessions();
   bindControls();
@@ -1112,6 +1114,9 @@ function bindChatHistory(fid){
 
 function checkExt(e){
   if(e.checked){
+    if(is_firefox){
+      detectExtensionFF();
+    }
     if(!extensionInstalled){
       $('#option-3')[0].checked = true;
       if(confirm('An Extension is require to share your screen.\r\nProceed to install.')){
@@ -1124,6 +1129,7 @@ function checkExt(e){
     }
   }
 }
+
 
 </script>
 </html>
