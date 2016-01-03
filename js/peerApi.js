@@ -62,6 +62,7 @@ var peerApi = {
     return pc;
   },
   attachStream: function(pc, constraints, onStream, mss, callback){
+    var self = this;
     if(mss){
       for(var i = 0; i < mss.length; i++){
         if(onStream) onStream({stream: mss[i]}, 'local');
@@ -70,16 +71,30 @@ var peerApi = {
       callback(true);
     }
     else{
-      this.getUserMedia.call(navigator, constraints, function (stream) {
-        if(onStream) onStream({stream: stream}, 'local');
-        pc.addStream(stream);
-        console.log('on stream');
-        callback(true);
-      }, function(e){
-        callback(false);
-        console.error(e);
-      });
+      if(constraints.audio && constraints.video && constraints.video.mandatory && constraints.video.mandatory.chromeMediaSource){
+        var audioConst = {audio: constraints.audio};
+        var videoConst = {video: constraints.video};
+        self.attachStreamHelper(pc, audioConst, function(){
+          self.attachStreamHelper(pc, videoConst, function(){
+            callback(true);
+          })
+        })
+      }
+      else{
+        this.attachStreamHelper(pc, constraints, callback);
+      }
     }
+  },
+  attachStreamHelper: function(pc, constraints, cb){
+    this.getUserMedia.call(navigator, constraints, function (stream) {
+      if(onStream) onStream({stream: stream}, 'local');
+      pc.addStream(stream);
+      console.log('on stream');
+      cb(true);
+    }, function(e){
+      cb(false);
+      console.error(e);
+    });
   },
   createOffer: function(pc, sdpExchCB){
     var self = this;

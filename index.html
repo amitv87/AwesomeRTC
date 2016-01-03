@@ -371,8 +371,8 @@ function bindControls(){
     var url = $('#url').val();
     proceedWithUri(name, url, function(e){
       if(e){
-        fetchSessions();
         $('#join_cancel').click();
+        window.location.href = window.location.href.split('?')[0];
       }
       else
         alert('invalid url');
