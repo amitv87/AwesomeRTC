@@ -131,7 +131,7 @@
         <div id="chat_list" class="overflowScroll cv_msg_container_base" style="max-height: 100%;padding:0px 10px 0px 10px;;position: absolute;bottom: 0;width: 100%;"></div>
       </div>
       <div id="chat_input_con" style="">
-        <textarea id="chat_input" rows="1" placeholder="type here ..." style="overflow: hidden; word-wrap: break-word; height: 38px;"></textarea>
+        <textarea id="chat_input" rows="1" placeholder="Type a message ..." style="overflow: hidden; word-wrap: break-word; height: 38px;"></textarea>
       </div>
     </div>
   </div>
@@ -1006,7 +1006,7 @@ function postMessage(message, local, ack, ts){
     msg_str += '<div class="cv_msg_container cv_base_' + source + '">';
     msg_str += '<div class="cv_messages cv_msg_' + source + '">';
     msg_str += content;
-    msg_str += '<time>' + (local ? 'you' : 'him / her') + ' / ' + getFormattedDate(ts ? ts : undefined);
+    msg_str += '<time>' + (local ? 'you' : 'he | she') + ' / ' + getFormattedDate(ts ? ts : undefined);
     if(id)
       msg_str += '<div class="__cv_m" id="__cv_m' + id + '"></div>';
     else if(ack)
