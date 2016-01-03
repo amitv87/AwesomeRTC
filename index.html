@@ -350,8 +350,10 @@ function bindControls(){
   $('#host_ok').click(function(){
     if(_skey == '')
       newSession(generateSessionKey());
-    else
+    else {
       newSession(_skey);
+      window.location.href = window.location.href.split('?')[0];
+    }
     $('#host_cancel').click();
   });
   $('#join').click(function(){

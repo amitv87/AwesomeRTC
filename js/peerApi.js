@@ -142,7 +142,10 @@ var peerApi = {
     pc.addIceCandidate(new this.IceCandidate(data));
   },
   answer: function(pc, data, sdpExchCB) {
-    pc.setRemoteDescription(new this.SessionDescription(data));
+    var self = this;
+    pc.setRemoteDescription(new this.SessionDescription(data), function(e){
+      // console.log('success setRemoteDescription', e);
+    },self.errorHandler);
   },
   errorHandler: function(err) {
     console.error(err);
