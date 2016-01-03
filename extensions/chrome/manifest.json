@@ -17,14 +17,14 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://amitv87.github.io/AwesomeRTC//*", "https://amitv87.github.io/AwesomeRTC//*"],
+      "matches": ["http://amitv87.github.io/AwesomeRTC/*", "https://amitv87.github.io/AwesomeRTC/*"],
       "js": ["content-script.js"]
     }
   ],
   "permissions": [
     "tabs",
     "desktopCapture",
-    "http://amitv87.github.io/AwesomeRTC//*",
-    "https://amitv87.github.io/AwesomeRTC//*"
+    "http://amitv87.github.io/AwesomeRTC/*",
+    "https://amitv87.github.io/AwesomeRTC/*"
   ]
 }

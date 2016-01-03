@@ -455,7 +455,7 @@ function bindControls(){
         e.preventDefault();
         return;
       }
-      postMessage(msg, true);
+      bindChatMessage(msg, true);
       $(this).val("");
       e.preventDefault();
       setTimeout(function(){
@@ -896,15 +896,13 @@ var chkhtml = '<span class="__cv_checkmark"><div class="__cv_checkmark_stem"></d
 if(!is_chrome && !is_firefox)
  alert('Browser not supported');
 else{
-  fetchSessions();
-  bindControls();
-  init();
   if(is_chrome){
     window.addEventListener('message', function (event) {
       if (event.origin != window.location.origin) return;
 
       // content-script will send a 'SS_PING' msg if extension is installed
       if (event.data.type && (event.data.type === 'AwesomeRTC_PING')) {
+        console.log('AwesomeRTC_PING');
         extensionInstalled = true;
       }
 
@@ -921,6 +919,9 @@ else{
       }
     });
   }
+  fetchSessions();
+  bindControls();
+  init();
   window.onbeforeunload = function(e){
     if(ws && ws.readyState == 1){
       window.reconnect = false;
@@ -994,10 +995,10 @@ function bindStatKeys(statsCon, key, rtcStats, level, actions){
 }
 
 function onChatMessage(message){
-  postMessage(message, false);
+  bindChatMessage(message, false);
 }
 
-function postMessage(message, local, ack, ts){
+function bindChatMessage(message, local, ack, ts){
   function bindMessage(id){
     message = linkify(htmlEncode(message));
     var content = '<p>' + message.replace(/\n\r?/g, '<br />') + '</p>';
@@ -1071,7 +1072,7 @@ function bindChatHistory(fid){
   getChats(fid, function(chats){
     for (var i = 0; i < chats.length; i++){
       var chat = chats[i];
-      postMessage(chat.msg, chat.local, chat.ack, chat.ts);
+      bindChatMessage(chat.msg, chat.local, chat.ack, chat.ts);
     }
   });
 }
