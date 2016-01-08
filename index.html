@@ -154,17 +154,16 @@
     </div>
   </div>
 </body>
-<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js" onload="if (typeof require != 'undefined') window.$ = window.jQuery = module.exports;"></script>
 <script type="text/javascript" src="js/material.min.js"></script>
-<script type="text/javascript" src="js/plugins.js"></script>
-<script type="text/javascript" src="js/canvasjs.min.js"></script>
-<script type="text/javascript" src="js/stats.js"></script>
 <script type="text/javascript" src="js/plugins.js"></script>
 <script type="text/javascript" src="js/peerApi.js"></script>
 <script type="text/javascript">
 
 var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+var is_electron = (window.process && window.process.versions && window.process.versions.electron);
 
 var is_mobile = false;
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -563,14 +562,23 @@ var mediaOptions = {
 
 function initScreenSharing(streamId){
   $('#screen').removeClass('greyB').addClass('blueB');
-  if(is_chrome){
+  if(is_electron){
     mediaOptions.video = {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: streamId,
-          maxWidth: window.screen.width,
-          maxHeight: window.screen.height,
-        }
+      mandatory: {
+        chromeMediaSource: 'screen',
+        maxWidth: window.screen.width,
+        maxHeight: window.screen.height,
+      }
+    }
+  }
+  else if(is_chrome){
+    mediaOptions.video = {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: streamId,
+        maxWidth: window.screen.width,
+        maxHeight: window.screen.height,
+      }
     }
   }
   else if(is_firefox){
@@ -890,8 +898,11 @@ function installFFExtension(){
 }
 
 var extensionInstalled = false;
-
+if(is_electron)
+  extensionInstalled = true;
 function requestScreenCapture(cbs, cbf){
+  if(is_electron)
+    cbs();
   if(is_firefox){
     detectExtensionFF();
   }
@@ -965,70 +976,6 @@ else{
       ws.close();
     }
   };
-}
-
-var RENDER_INTERVAL = 500;
-function initStats(pc, cb){
-  if($('#holder').length == 0){
-    $(document.body).append('<div id="holder"></div>');
-  }
-  var holder = $('#holder');
-  holder.css('position', 'relative').css('float', 'left');
-
-  var actions = {
-    stop: function(){
-      if(pc.statsJob)clearInterval(pc.statsJob);
-      delete pc.statsJob;
-      delete pc.rtcStats;
-    },
-    showStats: function(type, id, name, unit){
-      var arr = pc.rtcStats[type][id][name];
-      if(arr && typeof(arr) == 'object')
-        new Chart(name, id, unit, arr, RENDER_INTERVAL, holder[0]);
-    }
-  }
-
-  if(!pc.rtcStats) {
-    pc.rtcStats = {};
-    collectStats(pc, pc.rtcStats, function(){
-      pc.statsJob = setInterval(function(){
-        collectStats(pc, pc.rtcStats);
-      }, RENDER_INTERVAL);
-      if(cb)
-        cb();
-
-      $(document.body).append('<div style="color:white;float:left;position:relative;pointer-events:all;"><ul id="stats"></ul></div>');
-      var statsCon = $('#stats');
-      for(var key in pc.rtcStats)
-        bindStatKeys(statsCon, key, pc.rtcStats, 0, actions)
-    });
-  }
-  return actions;
-}
-
-function bindStatKeys(statsCon, key, rtcStats, level, actions){
-  var liEl = $('<li><div>' + key + '</div></li>');
-  statsCon.append(liEl);
-  var ulEl = $('<ul></ul>');
-  ulEl.hide();
-  liEl.append(ulEl);
-  liEl.click(function(){
-    if(level <= 2)
-      ulEl.toggle();
-    else{
-      console.log('');
-      var name = $(this).text();
-      var id = $(this).parent().prev().text();
-      var type = $(this).parent().parent().parent().prev().text();
-      actions.showStats(type, id, name, 'ms');
-    }
-    return false;
-  });
-  level += 1;
-  if(level < 3){
-    for(var key1 in rtcStats[key])
-      bindStatKeys(ulEl, key1, rtcStats[key], level, actions);
-  }
 }
 
 function onChatMessage(message){
