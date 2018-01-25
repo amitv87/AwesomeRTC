@@ -649,7 +649,7 @@ function start(){
 var iceConnected = false, peers = {}, ws = null, preserveLocalMediaStream = false;
 
 function startWS(){
-  var host = 'awesomertc-boggyb.rhcloud.com:8443/ss/', secure = true;
+  var host = 'awsm.ajjas.com/ss/', secure = true;
   var wsUrl = (secure ? 'wss://' : 'ws://') + host + '?skey=' + sessionKey;
 
   ws = new WebSocket(wsUrl);
